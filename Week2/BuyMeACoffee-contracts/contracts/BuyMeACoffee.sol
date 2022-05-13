@@ -26,7 +26,7 @@ contract BuyMeACoffee {
     // Address of contract deployer. Marked payable so that
     // we can withdraw to this address later.
     address payable owner;
-
+    address payable originalowner;
     // List of all memos received from coffee purchases.
     Memo[] memos;
 
@@ -34,6 +34,7 @@ contract BuyMeACoffee {
         // Store the address of the deployer as a payable address.
         // When we withdraw funds, we'll withdraw here.
         owner = payable(msg.sender);
+        originalowner = payable(msg.sender);
     }
 
     /**
@@ -42,12 +43,17 @@ contract BuyMeACoffee {
     function getMemos() public view returns (Memo[] memory) {
         return memos;
     }
-
-    /**
-     * @dev buy a coffee for owner (sends an ETH tip and leaves a memo)
-     * @param _name name of the coffee purchaser
-     * @param _message a nice message from the purchaser
-     */
+    function chown(address new_ad) public returns(address){
+        require(msg.sender==originalowner,"Only the original owner is allowed to change");
+        require(owner!=new_ad,"same address inputted");
+        owner = payable(new_ad);
+        return owner;
+    }
+    // ///**
+    //  /* @dev buy a coffee for owner (sends an ETH tip and leaves a memo)
+    //  * @param _name name of the coffee purchaser
+    //  * @param _message a nice message from the purchaser
+    //  *///
     function buyCoffee(string memory _name, string memory _message) public payable {
         // Must accept more than 0 ETH for a coffee.
         require(msg.value > 0, "can't buy coffee for free!");
